@@ -182,6 +182,29 @@ $(document).ready(function(){
                 $('#content').fadeIn("slow");
             }
         }
+
+    var delivery = new Delivery(socket);
+
+      $("#submit").click(function(e){
+        var file = $("#upload")[0].files[0];
+        delivery.send(file);
+        e.preventDefault();
+      });
+
+    delivery.on('send.success', function(fileID){
+      console.log("File sent");
+    });
+
+    // delivery.on('receive.start', function(fileID){
+    //   console.log('receiving file...');
+    // });
+
+    // delivery.on('receive.success', function(file){
+    //     if(file.isImage()){
+    //       $('img').attr('src', file.dataURL());
+    //     }
+    // });
+
     });
 
   socket.on("chat", function (name, message)

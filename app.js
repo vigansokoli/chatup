@@ -14,6 +14,9 @@ var io = require('socket.io')(server);
 
 server.listen(8000);
 
+dl = require('delivery');
+fs = require('fs');
+
 var env = process.env.NODE_ENV || 'development';
 app.locals.ENV = env;
 app.locals.ENV_DEVELOPMENT = env == 'development';
@@ -152,6 +155,32 @@ io.sockets.on("connection", function (client) {
             break;
     }
   });
+
+  //handle file sending
+
+      var delivery = dl.listen(client);
+
+      delivery.on('receive.success', function(file){
+          fs.writeFile(file.name, file.buffer, function(err){
+              if(err){
+                console.log('File not saved!');
+              }
+              else{
+                console.log("File saved");
+                return;
+              //     delivery.send({
+              //       name: 'sample-image.jpg',
+              //       path: './sample-image.jpg'
+              //     });
+
+              // delivery.on('send.success', function(file){
+              //     console.log("File sent to the client");
+              // });
+              }
+          });
+      });
 });
+
+
 
 module.exports = app;
