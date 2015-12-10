@@ -1,0 +1,305 @@
+.middle
+{
+    display:block;
+    float:left;
+    margin:0 auto;
+    padding-left:2%;
+    width:70%;
+    min-height: 100%;
+    max-height: 100%;
+    background: #C2C3C3;
+}
+.main
+{
+    background: lightgrey;
+    width: 100%;
+}
+.left
+{
+    text-align: center;
+    float:left;
+    color:#ACF;
+    display: block;
+    background:#223;
+    width:15%;
+    border-right: 2px solid black;
+    text-shadow: 1px 2px black;
+    min-height: 100%;
+    max-height: 100%;
+}
+.right
+{
+    float:right;
+    color:#ACF;
+    background:#223;
+    width:15%;
+    display: block;
+    border-left:2px solid black;
+    text-shadow: 1px 2px black;
+    text-align:center;
+    min-height: 100%;
+    max-height: 100%;
+     overflow-y:hidden;
+}
+.your-group
+{
+    display: block;
+}
+.your-private-chats
+{
+    display: block;
+}
+.system-groups
+{
+    display: block;
+}
+.system-users
+{
+    margin-top:15%;
+    display: block;
+}
+.ul-your-private-chats
+{
+    margin:0;
+    padding: 0;
+    width:100%;
+    margin-top:3%;
+    overflow-y: auto;
+    max-height: 37%;
+    min-height: 37%;
+}
+.ul-your-groups
+{
+    margin:0;
+    padding: 0;
+    overflow-y: auto;
+    max-height: 40%;
+    min-height: 40%;
+    width:100%;
+    margin-top:3%;
+}
+.ul-system-groups
+{
+    margin:0;
+    padding: 0;
+    width:100%;
+    margin-top:3%;
+    margin-bottom: 3%;
+    min-height: 40%;
+    max-height: 40%;
+    overflow-y:auto;
+}
+.ul-system-users
+{
+    margin:0;
+    padding: 0;
+    width:100%;
+    margin-top:5%;
+    min-height: 40%;
+    max-height: 40%;
+    overflow-y:auto;
+}
+.test
+{
+    height:7%;
+    margin-top:2px;
+}
+.button-class
+{
+    display: block;
+}
+.send-message
+{
+    display:block;
+    min-height: 8%;
+    max-height: 8%;
+    overflow-y:hidden;
+}
+.message
+{
+    display: block;
+    float:none;
+    text-decoration: none;
+    list-style-type:none;
+    min-height:90%;
+    max-height:90%;
+    overflow-y:auto;
+}
+#form
+{
+    margin-bottom: 0;
+}
+.text-message
+{
+    display: block;
+    padding: 1%;
+    text-decoration: none;
+    list-style-type:none;
+    color:purple;
+}
+.ul-messages
+{
+    padding: 1.5% 0%;
+    overflow-y: auto;
+}
+#message
+{
+    width:95%;
+    padding:1%;
+    border-radius: 10px 10px 10px 10px;
+    background: white;
+    color:brown;
+}
+#message:focus
+{
+    outline: none;
+}
+.ul-your-private-chats li , .your-group li, .system-groups li, .system-users li
+{
+    text-decoration: none;
+    list-style-type:none;
+}
+.ul-your-groups::-webkit-scrollbar {
+    width: 0.3em;
+}
+.ul-your-groups::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+}
+.ul-your-groups::-webkit-scrollbar-thumb {
+  background-color: darkgrey;
+  outline: 1px solid slategrey;
+}
+.ul-your-private-chats::-webkit-scrollbar {
+    width: 0.3em;
+}
+.ul-your-private-chats::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+}
+.ul-your-private-chats::-webkit-scrollbar-thumb {
+  background-color: darkgrey;
+  outline: 1px solid slategrey;
+}
+.ul-system-groups::-webkit-scrollbar {
+    width: 0.3em;
+}
+.ul-system-groups::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+}
+.ul-system-groups::-webkit-scrollbar-thumb {
+  background-color: darkgrey;
+  outline: 1px solid slategrey;
+}
+.ul-system-users::-webkit-scrollbar {
+    width: 0.3em;
+}
+.ul-system-users::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+}
+.ul-system-users::-webkit-scrollbar-thumb {
+  background-color: darkgrey;
+  outline: 1px solid slategrey;
+}
+
+  /**
+   *  CSS for login screen
+   */
+.li-your-group:hover, .li-system-groups:hover
+{
+    background: grey;
+}
+.li-your-private-chats:hover, .li-system-users:hover
+{
+    background: darkgrey;
+}
+.li-your-private-chats:active, .li-system-users:active
+{
+    border:1px solid white;
+}
+.ul-your-group-settings
+{
+    position: absolute;
+    margin-left: 13.7%;
+    margin-top: -1.65%;
+    padding-left: 0.899%;
+    visibility: hidden;
+}
+.ul-system-groups-settings
+{
+    margin-left: -7.7%;
+    margin-top: -1.65%;
+    padding: 0;
+    position: absolute;
+    visibility: hidden;
+}
+.ul-system-users-settings
+{
+    padding: 0;
+    position: absolute;
+    margin-left: -9.75%;
+    margin-top: -1.65%;
+    visibility: hidden;
+}
+.ul-your-group-settings li , .ul-system-groups-settings li, .ul-system-users-settings li
+{
+    background: grey;
+    color:white;
+    display: block;
+    padding:5% 3%;
+    list-style: none;
+    border-bottom:1px solid white;
+    font-size: 15px;
+}
+.ul-your-group-settings li:hover
+{
+    background:#ffa64d;
+}
+.ul-system-groups-settings li:hover
+{
+    background:#ffa64d;
+}
+.ul-your-groups li:hover > .ul-your-group-settings
+{
+    visibility: visible;
+}
+.ul-system-groups li:hover > .ul-system-groups-settings
+{
+    visibility: visible;
+}
+.li-your-group , .li-system-groups, .li-system-users , .li-your-private-chats
+{
+    padding: 3% 3%;
+}
+#error-create-group
+{
+    color:red;
+}
+
+#user-login{
+    height:100%;
+    width: 100%;
+    background: black;
+}
+​
+#user-login{
+    display: table;
+}
+​
+.vertical-center-row {
+    display: table-cell;
+    vertical-align: middle;
+}
+​
+#username{
+    width: 450px;
+}
+​
+#wrong-username,#update-user{
+    position: fixed;
+}
+
+
+
+
+
+
+
