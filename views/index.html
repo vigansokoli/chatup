@@ -23,8 +23,16 @@
               </div>
             </div>
           </div>
-              <div id="content" style="display:none">+
-
+              <div id="content" style="display:none">
+                <div id="add-user-to-group" class="modal hide fade">
+                  <div class="modal-body">
+                    <strong><span id="user-to-join">User X</span></strong> wants to join the group.
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" data-dismiss="modal" class="btn" data-value="0">Decline</button>
+                    <button type="button" data-dismiss="modal" class="btn btn-primary" data-value="1">Approve</button>
+                  </div>
+                </div>
                 <div class="left">
                     <div class="your-group">
 
@@ -35,6 +43,7 @@
                     </div>
                     <div class="button-class">
                             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#create-group-modal">Create group</button>
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#create-group-modal">Private Message</button>
                     </div>
                     <div class="your-private-chats">
 
@@ -52,22 +61,25 @@
                         <p id="update-notification"></p>
                       </div>
                     </div>
-                    <div class="message">
-                            <ul class="ul-messages" id="msg">
+                    <div id="sendboxmessage">
+                      <div class="message">
+                              <ul class="ul-messages" id="msg">
 
-                            </ul>
+                              </ul>
+                      </div>
                     </div>
-                    <div class="send-message">
+                      <div class="send-message">
 
 
-                        <form onsubmit="">
-                        <input type="text" id="message" autocomplete="off" palceholder="Your message here">
-                        </form>
+                          <form onsubmit="">
+                          <input type="text" id="message" autocomplete="off" palceholder="Your message here">
+                          </form>
 
-                        <div class="upload-file">
+                          <div class="upload-file">
 
-                        </div>
-                    </div>
+                          </div>
+                      </div>
+
 
                 </div>
 

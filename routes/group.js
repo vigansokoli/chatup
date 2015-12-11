@@ -10,9 +10,7 @@ function Group(name, id, owner, permission) {
 };
 
 Group.prototype.addPerson = function(person) {
-  if (this.status === "available") {
     this.people.push(person);
-  }
 };
 
 Group.prototype.removePerson = function(person) {
@@ -39,6 +37,10 @@ Group.prototype.getPerson = function(personID) {
 
 Group.prototype.permissionType = function() {
   return this.permission;
+};
+
+Group.prototype.setPassword = function(pass) {
+  this.password = pass;
 };
 
 module.exports = Group;
