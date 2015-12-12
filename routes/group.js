@@ -9,14 +9,14 @@ function Group(name, id, owner, permission) {
   //this.private = false;
 };
 
-Group.prototype.addPerson = function(person) {
-    this.people.push(person);
+Group.prototype.addPerson = function(personId) {
+    this.people.push(personId);
 };
 
-Group.prototype.removePerson = function(person) {
+Group.prototype.removePerson = function(personId) {
   var personIndex = -1;
   for(var i = 0; i < this.people.length; i++){
-    if(this.people[i].id === person.id){
+    if(this.people[i]=== personId){
       personIndex = i;
       break;
     }
@@ -24,15 +24,13 @@ Group.prototype.removePerson = function(person) {
   this.people.remove(personIndex);
 };
 
-Group.prototype.getPerson = function(personID) {
-  var person = null;
-  for(var i = 0; i < this.people.length; i++) {
-    if(this.people[i].id == personID) {
-      person = this.people[i];
-      break;
+Group.prototype.isMember = function(personId) {
+  for(var i = 0; i < this.people.length; i++){
+    if(this.people[i]=== personId){
+      return true;
     }
   }
-  return person;
+  return false;
 };
 
 Group.prototype.permissionType = function() {
@@ -41,6 +39,10 @@ Group.prototype.permissionType = function() {
 
 Group.prototype.setPassword = function(pass) {
   this.password = pass;
+};
+
+Group.prototype.getPassword = function(pass) {
+  return this.password;
 };
 
 module.exports = Group;

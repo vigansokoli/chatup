@@ -124,6 +124,7 @@
     min-height:90%;
     max-height:90%;
     overflow-y:auto;
+    border:1px solid red;
 }
 #form
 {
@@ -297,9 +298,28 @@
     position: fixed;
 }
 
+.modal-body>ul
+{
+  list-style-type:none;
+}
 
+.btn-kick-user
+{
+    outline: none;
+    border: 0;
+    background: transparent;
+    color: #cc0000;
+}
 
+.red
+{
+  background:red;
+  color: white;
+}
 
-
-
+.gray
+{
+  background:gray;
+  color: white;
+}
 

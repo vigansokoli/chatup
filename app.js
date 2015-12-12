@@ -74,40 +74,130 @@ app.use(function(err, req, res, next) {
     });
 });
 
+var people = {};
+var groups = {};
+var sockets = [];
 
-var people = [];
-var groups = [];
 //var sockets = [];
 var chatHistory = {};
 
 io.sockets.on("connection", function (client) {
+
+    sockets[client.id] = client;
+
+    client.emit("client-id", client.id);
+
   client.on("join-server", function(name) {
+
+    var id = client.id;
+
+    console.log("the id is " + id);
+
     console.log("joined server " + name);
 
-    var person = new Person(client.id, name);
+    var person = new Person(id, name);
 
-    people[client.id] = person;
+    people[id] = person;
 
     //client.emit("update","You have joined the room");
 
-    io.sockets.emit("update-people-table", person);
-
     // update the Arraays on the other fields
+    //
+    console.log(groups);
+    console.log(JSON.stringify(groups));
 
-    io.sockets.emit("update-people", person);
+    io.sockets.emit("update-peoples-table", people);
+
+    io.sockets.emit("update-groups-table", groups);
+
   });
 
   client.on("send", function(message){
     io.sockets.emit("chat", people[client.id].name, message);
   });
 
+  client.on("send-private", function(sendeeId,message){
+    sendeeClient = sockets[sendeeId];
+
+   sendeeClient.emit("chat-private", people[client.id], message);
+ });
+
+  client.on("send-group-chat", function(groupId,message){
+
+    var group = groups[groupId];
+    var groupMember;
+    var socketToSend;
+    var sendee;
+    console.log("im loooking for these fucking guys" + group.people);
+    sender = people[client.id];
+    senderId = sender.id;
+
+    for(var i =0; i < group.people.length; i++)
+    {
+      groupMember = group.people[i];
+      socketToSend =  sockets[groupMember];
+      sendee = people[groupMember];
+
+      if(senderId != sendee.id)
+        socketToSend.emit("chat-group", group, sender, message);
+    }
+
+      groupMember = group.owner;
+      socketToSend =  sockets[groupMember];
+      sendee = people[groupMember];
+
+      if(senderId != sendee.id)
+      socketToSend.emit("chat-group", group, sender, message);
+ });
+  /*
+  socket.on("typing",function(message, sendeeId)
+  {
+      sendeeClient = sockets[sendeeId];
+
+      client.send("send-typing", people[client.id],message);
+  })
+*/
+
   client.on("disconnect", function()
   {
+
+    //update and inform all the groups where he is member
+    //delete and update all the groups where he is owner
+    //update and inform the private chats
+    //update and inform the chat
+  /*  var clientId = client.id;
+    var person =people[clientId];
+    var personGroups = person.getGroups();
+    var groupsOwner = [];
+
+    for(var i in groups)
+    {
+      if(groups[i].owner = clientId)
+      {
+        groupsOwner.push(groups[i]);
+      }
+    }
+
+    for(var j=0; j<personGroups.length; j++)
+    {
+
+    }
+
+    for(var k=0; k<groupsOwner.length; k++)
+    {
+
+    }
+
+
+
+
     io.emit("update-people-table", people[client.id]);
 
     delete people[client.id];
 
     io.sockets.emit("update-people", people);
+
+    */
   });
 
   client.on("close-group", function(groupId)
@@ -133,7 +223,7 @@ io.sockets.on("connection", function (client) {
     console.log('get-group');
 
     var group = groups[groupId];
-        console.log('Le grupa poeop is' + group.people);
+    //console.log('Le grupa poeop is' + group.people);
     var groupMembers = [];
 
       for(var i=0; i<group.people.length; i++)
@@ -143,7 +233,7 @@ io.sockets.on("connection", function (client) {
         {
           console.log("eafl;esjkfae;slfjka " + people[j].id);
 
-          if(group.people[i] == people[j].id)
+          if(group.people[i] === people[j].id)
           {
               groupMembers.push(people[j]);
               console.log("name is " +people[j].name);
@@ -160,44 +250,55 @@ io.sockets.on("connection", function (client) {
 
     var id = uuid.v4();
     console.log(id);
+    clientId = client.id;
+    var group = new Group(groupInfo.name, id, people[clientId].id, groupInfo.permission);
 
-    var group = new Group(groupInfo.name, id, client.id, groupInfo.permission);
     groups[id] = group;
     console.log("the groups id is " + groups[id].id);
+    console.log("permission" + groups[id].permission);
 
-    if(typeof groupInfo.password != "undefined")
+    if(groupInfo.password != "undefined")
     {
       group.setPassword(groupInfo.password);
     }
+    console.log("the client id is in create groups " + clientId);
+    people[clientId].addGroup(id);
 
-    people[client.id].addGroup(id);
-
-    group.addPerson(client.id);
-
-    io.sockets.emit("update-people", people);
-    io.sockets.emit("update-groups", groups);
-
-    client.emit("update-created-group-table", group);
+    io.sockets.emit("update-groups-table", groups);
 
   });
+
 
   client.on("update-groups", function(updatedGroups){
       console.log("Groups updated");
       groups = updatedGroups;
   });
 
+
   client.on("change-owner", function(updatedGroups){
   });
 
   client.on("get-group-info", function(id){
+
   });
 
-  client.on("join-group", function(name, permission)
+  client.on("join-group", function(id)
   {
+    var group = groups[id];
+    var clientId = client.id;
+
+    console.log("well im here and the permiision is " + group.permission);
+    var permission = group.permission;
+
+
     switch(permission) {
         case "permission":
             break;
         case "free":
+        people[clientId].addGroup(group.id);
+        group.addPerson(clientId);
+        console.log("teh group people are " + group.people);
+        client.emit("update-groups-table", groups);
             break;
         case "password":
             break;

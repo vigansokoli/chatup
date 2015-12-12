@@ -21,5 +21,9 @@ var groupIndex = -1;
   }
   this.groups.remove(personIndex);
 };
+Person.prototype.getGroups = function(group) {
+  return this.groups;
+};
+
 
 module.exports = Person;
