@@ -15,13 +15,16 @@ var privateStr = "-private";
 var chatStr = "-chats";
 var systemStr = "-system";
 var userStr = "-users";
-var groupStr = "-groups";
+var groupsStr = "-groups";
+var groupStr = "-group";
 var yourStr = "-your";
 var privateChat = "private";
 var groupChat = "group";
 var istyping="";
-
-
+var inputStr = "-input";
+var istyping="";
+timeoutId = "";
+var thresholds ={};
 
 function isEmpty(id)
 {
@@ -37,9 +40,8 @@ function appendGroupLists(groupInfo)
     var name = groupInfo.name;
     var id = groupInfo.id;
     var owner = groupInfo.owner;
-    console.log("the owner is " + owner);
-    console.log(id + " " + clientId);
     var members = groupInfo.people;
+
     groupInfo.isMember = function(personId) {
     for(var i = 0; i < this.people.length; i++){
       if(this.people[i]=== personId){
@@ -49,14 +51,13 @@ function appendGroupLists(groupInfo)
       return false;
     };
 
-    $('.ul' + systemStr + '' + groupStr + '').append('<li class="li' + systemStr + '' + groupStr + '" id="'+ id +'' + systemStr + '">'+ name + '<ul class="ul' + systemStr + '' + groupStr + '-settings"></ul></li>');
+    $('.ul' + systemStr + '' + groupsStr + '').append('<li class="li' + systemStr + '' + groupsStr + '" id="'+ id +'' + systemStr + '">'+ name + '<ul class="ul' + systemStr + '' + groupsStr + '-settings"></ul></li>');
     $('#' + id +'' + systemStr + ' ul').append('<li class="view' + userStr + '">View Users</li>');
 
-    console.log("the client id is " + clientId + " and the owner is " + owner);
 
     if(clientId === owner)
     {
-      $('.ul' + yourStr + '' + groupStr + '').append('<li class="li' + yourStr + '-group" id="'+ id +'' + yourStr + '"> '+ name + '<ul class="ul' + yourStr + '-group-settings"></ul></li>');
+      $('.ul' + yourStr + '' + groupsStr + '').append('<li class="li' + yourStr + '' + groupStr + '" id="'+ id +'' + yourStr + '"> '+ name + '<ul class="ul' + yourStr + '' + groupStr + '-settings"></ul></li>');
 
       $('#' + id +'' + systemStr + ' ul').append('<li class="conversate">Conversate</li>');
       $('#' + id +'' + yourStr + ' ul').append('<li class="conversate">Conversate</li>');
@@ -71,12 +72,12 @@ function appendGroupLists(groupInfo)
     }
     else if(groupInfo.isMember(clientId))
     {
-        $('.ul' + yourStr + '' + groupStr + '').append('<li class="li' + yourStr + '-group" id="'+ id +'' + yourStr + '"> '+ name + '<ul class="ul' + yourStr + '-group-settings"></ul></li>');
+        $('.ul' + yourStr + '' + groupsStr + '').append('<li class="li' + yourStr + '' + groupStr + '" id="'+ id +'' + yourStr + '"> '+ name + '<ul class="ul' + yourStr + '-group-settings"></ul></li>');
         $('#' + id +'' + systemStr + ' ul').append('<li "class="conversate">Conversate</li>');
         $('#' + id +'' + yourStr + ' ul').append('<li class="conversate">Conversate</li>');
         $('#' + id +'' + yourStr + ' ul').append('<li class="view' + userStr + '">View Users</li>');
-        $('#' + id +'' + systemStr + ' ul').append('<li class="leave-group">Leave Group</li>');
-        $('#' + id +'' + yourStr + ' ul').append('<li class="leave-group">Leave Group</li>');
+        $('#' + id +'' + systemStr + ' ul').append('<li class="delete-group">Leave Group</li>');
+        $('#' + id +'' + yourStr + ' ul').append('<li class="delete-group">Leave Group</li>');
     }
     else
     {
@@ -89,7 +90,6 @@ function appendPeopleLists(userInfo)
 {
     var name = userInfo.name;
     var id = userInfo.id;
-    console.log("the id in append people is " + id);
 
     if(clientId != id)
     {
@@ -102,12 +102,28 @@ var reg = /^[0-9a-zA-Z]+$/;
 //Jquerry
 $(document).ready(function(){
 
-      var socket = io.connect('http://localhost:3000');
 
-          socket.on("client-id",  function(cId){
-          clientId = cId;
-          console.log(clientId);
-      });
+    function kickUser()
+    {
+        socket.emit("delete-group", groupId);
+    }
+
+    function resetThreshold(groupId)
+    {
+        thresholds[groupId].threshold.clearTimeout();
+        var thresholdTime = thresholds[groupId].threshold;
+
+        var threshold =  setTimeout(kickUser(groupId), thresholdTime);
+
+        thresholds[groupId].timeLeft = threshold;
+        thresholds[groupId].threshold = thresholdTime;
+    }
+
+    var socket = io.connect('http://localhost:3000');
+
+        socket.on("client-id",  function(cId){
+        clientId = cId;
+    });
 
     //Modal that represents the group form
      $("#permission-type").change(function() {
@@ -120,20 +136,20 @@ $(document).ready(function(){
          $("#group-password").val('');
        }
     });
+
     $('#group-settings').click(function(){
     });
 
 
      // The action taken when the create group button is clicked
      // Puts information into javascript object
-    $('#btn-create-group').click(function()
+    $('#btn-create' + groupStr + '').click(function()
     {
         var groupInformation = {};
         var bool = true;
 
         if(isEmpty('#group-name') || isEmpty('#threshold-time'))
        {
-            console.log("nothing");
             bool= false;
        }
        else
@@ -142,7 +158,6 @@ $(document).ready(function(){
                 var y = $('#threshold-time').val()
                 var permissionType = $('#permission-type').val();
 
-                console.log("the permission type is" + permissionType);
 
                 var validgropuname  = reg.test(x); //validUsername is a boolean
                 var validthreshold  = reg.test(y);
@@ -150,6 +165,7 @@ $(document).ready(function(){
             {
                 groupInformation.name = $('#group-name').val();
                 groupInformation.thresholdtime = $('#threshold-time').val();
+
 
                   switch(permissionType) {
                   case "free":
@@ -178,16 +194,15 @@ $(document).ready(function(){
         {
             groupInformation.permission = permissionType;
             socket.emit("create-group", groupInformation);
-            console.log(JSON.stringify(groupInformation));
-            var x = $('#btn-create-group');
+            var x = $('#btn-create' + groupStr + '');
             x.attr("data-dismiss", "modal");
             $('#group-password').val("");
             $('#group-name').val("");
             $('#threshold-time').val("");
-            $('#error-create-group').text("");
+            $('#error-create' + groupStr + '').text("");
         }
         else
-            $('#error-create-group').text("Fill the required fields or Only letters and numbers allowed");
+            $('#error-create' + groupStr + '').text("Fill the required fields or Only letters and numbers allowed");
     });
 
     $('ul').on("click", ".join-group", function(event)
@@ -195,10 +210,10 @@ $(document).ready(function(){
         var id = $(event.target).parent().parent().attr('id');
         id = id.split(systemStr, 1)[0];
         id = id.split(yourStr, 1)[0];
-        console.log("the parent id is in join group " + id);
 
-        socket.emit("join-group", id);
+        socket.emit("join-group",id);
     });
+
 
     $('ul').on("click", ".conversate", function(event)
     {
@@ -209,26 +224,16 @@ $(document).ready(function(){
         id = id.split(yourStr, 1)[0];
         id = id.split(yourStr, 1)[0];
 
-        console.log("the parent id is in conversate " + id + " and the name is " + name);
-
         openChat(id,groupChat);
     });
-
-    $('.btn-kick-user').click(function(e){
-      setTimeout(function(){
-        $(e.target).parent().remove();
-      }, 300);
-      e.preventDefault();
-    });
-
-    $('ul').on("click", ".view" + userStr,function(event)
+    $('ul').on("click", ".delete" + groupStr,function(event)
     {
-      console.log("diphshit");
       //$('#view' + userStr + '').('show');
       var str = $(event.target).parent().parent()[0].id;
       var id = str.split(yourStr, 1)[0];
       id = id.split(systemStr, 1)[0];
-      socket.emit("get-group", id);
+
+      socket.emit("delete-group", id);
     });
 
     //To show the div that contains the messages
@@ -256,6 +261,7 @@ $(document).ready(function(){
     function showChat(divid)
     {
       var newDiv = divid + privateStr +chatStr;
+      var inputDiv = divid + inputStr;
 
       $('#'+ newDiv).show();
     }
@@ -264,15 +270,17 @@ $(document).ready(function(){
     {
 
       var newDiv = divid + privateStr +chatStr;
+      var inputDiv = divid + inputStr;
 
-      $('.message').prepend('<ul id="' + newDiv + '"class="ul-messages" style="display:none;"><span class="glyphicon glyphicon-remove"  aria-label="true" id="iks" style="float:right"></span></ul>');
+      $('.message').prepend('<ul id="' + newDiv + '"class="ul-messages" style="display:none;"><span class="glyphicon glyphicon-remove"  aria-label="true" id="iks" style="float:right;position:fixed;left:82.5%;top:2%; "></span><input type="text" class="message-input" id="' + inputDiv +'" autocomplete="off" palceholder="Your message here"></input> <span id="istyping"style="display:none;"></span></ul>');
+
     }
 
     function openChat(divid, messageType)
     {
          var newDiv = divid + privateStr +chatStr;
 
-         if(currentId !== "" && currentId !== divid)
+         if(currentId !== "")
          {
                $('#' + currentId + privateStr + chatStr).hide();
          }
@@ -281,11 +289,12 @@ $(document).ready(function(){
          if(chatIsCreated(divid))
          {
             showChat(divid);
+            $('#istyping').hide();
          }
          else
          {
-          createChat(divid);
-          $('#'+ divd).show();
+            createChat(divid);
+            $('#'+ divid).show();
          }
 
          highlightConv(divid, messageType);
@@ -310,7 +319,6 @@ $(document).ready(function(){
                   $('#' +parentId).hide('slow', function(){ $('#' +parentId).remove(); });
 
                   $('#' + divid + systemStr).show(500);
-                  currentId = "";
              });
          }
       }
@@ -346,7 +354,6 @@ $(document).ready(function(){
       }
 
      $('body').on("click", "#iks", function(){
-          console.log("iks is responding");
 
           if(currentId != "")
           {
@@ -369,19 +376,6 @@ $(document).ready(function(){
             }
       }
 
-
-     $('body').on("click", "#iks", function(){
-          console.log("iks is responding");
-
-          if(currentId != "")
-          {
-            $('#' + currentId+ privateStr+chatStr).hide();
-            highlightConv(currentId, "");
-            currentId="";
-            currentMessageFrom = "";
-          }
-     });
-
     // When enter is pressed message is represented
     // The scroll is sent to the max height(end)
 
@@ -395,7 +389,6 @@ $(document).ready(function(){
            var name = $(event.target).text();
 
            moveMessage(divid, name);
-           openChat(divid,privateChat);
       });
 
 
@@ -408,26 +401,27 @@ $(document).ready(function(){
           openChat(id, privateChat);
     });
 
-        $('#message').keypress(function(e)
+        $("#sendboxmessage").on("keypress",'.message-input',function(e)
         {
            if (e.which ==13)
            {
-                var x = $('#message').val();
+                var x = $('#' + currentId + inputStr).val();
 
                 if(x !== "")
                 {
-                  console.log("got till here " + x)
                   if(currentId !== "")
                   {
-                    console.log("the current ivfuckingd is" + currentId);
                     if(currentMessageFrom === "group")
                     {
+
                       socket.emit("send-group-chat", currentId, x);
                     }
                     else if(currentMessageFrom === "private")
                     {
                       socket.emit("send-private", currentId, x);
-                    }
+                      socket.emit("istyping",currentId,"");
+                     istyping="";
+                   }
 
                       $('#' + currentId + privateStr + chatStr).append('<li class="text-message"><b> Me: </b>'+ x +'</li>');
                   }
@@ -443,13 +437,17 @@ $(document).ready(function(){
                  height += '';
 
                $('.message').animate({scrollTop: height});
-               $('#message').val("").focus();
+               $('.message-input').val("").focus();
                return false;
            }
+           else if(e.which !=13)
+             {
+               socket.emit("istyping",currentId,$('.message-input').val());
+              }
             else
             {
-              var y = $('#message').val();
-                socket.emit("typing", currentId, y);
+              var y = $('.message-input').val();
+              socket.emit("typing", currentId, y);
             }
        });
 
@@ -484,7 +482,7 @@ $(document).ready(function(){
         }
 
         $('.launchConfirm').on('click', function (e) { //launchConfird is the class of the html element that triggers the event
-           $('#add-user-to-group')
+           $('#add-user-to' + groupStr + '')
                .modal({ backdrop: 'static', keyboard: false })
                .one('click', '[data-value]', function (e) {
                    if($(this).data('value')) {
@@ -497,6 +495,15 @@ $(document).ready(function(){
         });
     });
 
+
+  $(".message-input").keypress(function(e){
+
+      if(istyping !== $('#message').val())
+      {
+            socket.emit("istyping",currentId,$('#message').val());
+            istyping=$('#message').val();
+      }
+    });
   $("#btn-create-group").click(function()
   {
       var groupName = $('#group-name').val();
@@ -507,11 +514,8 @@ $(document).ready(function(){
   socket.on("chat-private", function (client, message)
  {
      var name = client.name;
-     console.log("THE NAME IS" + client.name);
      var divid = client.id;
      var newDiv = divid + privateStr + chatStr;
-
-     console.log("divid" + divid + "newDiv" + newDiv);
 
       moveMessage(divid, name);
       if(currentId !== divid)
@@ -526,15 +530,154 @@ $(document).ready(function(){
 
         $('#' + newDiv).append('<li class="text-message"><b>'+ name +': </b>'+ message +'</li>');
    });
+
+    socket.on("show-password-input",function(password){
+             $('#input-password').focus();
+             $('#join-password')
+                 .modal({ backdrop: 'static'})
+                 .one('click', '[data-value]', function (e) {
+                     if($(this).data('value')) {
+                         //add user to group and send a notification to him
+                     } else {
+                         //notify user that he has not been allowed to join the group
+                     }
+                 });
+          $('#input-password').keypress(function(e)
+           {
+             if (e.which ==13)
+             {
+                     if($('#input-password').val()==password)
+                     {
+                        socket.emit('approved');
+                        $('#join-password').modal('hide');
+                     }
+                     else
+                     {
+                      $("#error-password").text("Incorent password");
+                     }
+             }
+           });
+          $('#join-button').click(function(){
+               if($('#input-password').val()==password)
+                     {
+                        socket.emit('approved');
+                        $('#join-password').modal('hide');
+                     }
+                     else
+                     {
+                      $("#error-password").text("Incorent password")
+                     }
+            });
+    });
+
+    socket.on("notificate-user",function(password){
+        $('#update-user').show();
+        $('#update-notification').text("The request to join group is sent. The owner will respond")
+        $('#update-user').fadeOut(3000);
+
+    });
+
+    socket.on("aproval-notification",function(type,gname){
+      console.log("ddaddasas");
+       $('#update-user').show();
+       if(type=="ok")
+         $('#update-notification').text("Group "+ gname + " owner approved your request");
+      else
+         $('#update-notification').text("Your request to joing group: "+gname+" was declined!");
+
+       $('#update-user').fadeOut(6000);
+    });
+
+      socket.on("istypingnotification",function(fromwhom,message)
+      {
+        if(currentId===fromwhom.id)
+         {
+          $('#istyping').show();
+          $('#istyping').text("Keystrokes of "+fromwhom.name+":"+message);
+        }
+        else
+         {
+          $('#istyping').text("");
+          $('#istyping').hide();
+        }
+      });
+
+        $('#message').keypress(function(e)
+        {
+
+           if (e.which ==13)
+           {
+
+                var x = $('#message').val();
+
+                if(x !== "")
+                {
+                  if(currentId !== "")
+                  {
+                    if(currentMessageFrom === "group")
+                    {
+                      socket.emit("send-group-chat", currentId, x);
+                    }
+                    else if(currentMessageFrom === "private")
+                    {
+                      socket.emit("send-private", currentId, x);
+                      istyping="";
+                      socket.emit("istyping",currentId,"");
+                    }
+
+                      $('#' + currentId + privateStr + chatStr).append('<li class="text-message"><b> Me: </b>'+ x +'</li>');
+                  }
+                  else
+                  {
+                    alert("Please select a conversation or a group in order to send the text");
+                  }
+               }
+
+                $('.ul-messages').each(function(i, value)
+                {
+                    height += parseInt($(this).height());
+                 });
+                 height += '';
+
+               $('.message').animate({scrollTop: height});
+               $('#message').val("").focus();
+               return false;
+           }
+
+            else if(e.which !=13)
+              {
+                socket.emit("istyping",currentId,$('#message').val());
+               }
+            else
+            {
+              var y = $('#message').val();
+                socket.emit("typing", currentId, y);
+            }
+       });
+
+    socket.on("approve-user",function(name){
+        $("#add-user-to-group").show();
+        $("#user-to-join").text(name);
+
+        $('#approve').click(function(){
+          var x ="ok";
+          socket.emit("approval-type",x);
+          $("#add-user-to-group").fadeOut(3000);
+        });
+
+         $('#decline').click(function(){
+          var y ="notok";
+          socket.emit("approval-type",y);
+          $("#add-user-to-group").fadeOut(3000);
+        });
+       });
 
   socket.on("send-typing", function (client, message)
  {
      var name = client.name;
-     console.log("THE NAME IS" + client.name);
      var divid = client.id;
      var newDiv = divid + "-typing";
 
-     console.log("divid" + divid + "newDiv" + newDiv);
 
       moveMessage(divid, name);
       if(currentId !== divid)
@@ -549,6 +692,38 @@ $(document).ready(function(){
 
         $('#' + newDiv).append('<li class="text-message"><b>'+ name +': </b>'+ message +'</li>');
    });
+
+    $('ul').on("click", ".change-owner", function(event)
+    {
+        var id = $(event.target).parent().parent().attr('id');
+        id = id.split(systemStr, 1)[0];
+
+        $('#change-owner').modal('show');
+
+        socket.emit("get-group", id);
+
+        socket.on('send-group', function(group, members, owner){
+
+        $('#change-owner-list').empty(); //removes the data of previous group
+
+          for (var key in members){
+
+              if(clientId != members[key].id)
+              {
+                $('#change-owner-list').append('<li id="' + members[key].id + '">'+members[key].name + '<input type="radio" name="change-owner" value="' + members[key].id + '"></li>');
+              }
+            }
+          });
+
+          $('#btn-change-owner').click(function(e){
+            var newOwner = $("input:radio[name=change-owner]:checked").val();
+            socket.emit('change-owner', id, newOwner);
+            //socket.emit('change-owner', groupId, newOwner);
+
+            e.preventDefault();
+          });
+
+    });
 
      socket.on("chat-group", function (group, client, message)
     {
@@ -581,25 +756,45 @@ $(document).ready(function(){
   socket.on("update-peoples-table", function(membersInfo)
   {
     $(".ul" + systemStr + userStr ).empty();
-    console.log(JSON.stringify(membersInfo));
 
     for (var key in membersInfo)
     {
-      console.log( " member info and key " +membersInfo[key].id);
-      console.log("the following query is + " + $( "#" + membersInfo[key].id + privateStr).length);
       if($( "#" + membersInfo[key].id + privateStr).length === 0)
         appendPeopleLists(membersInfo[key]);
     }
   });
 
+  socket.on("information", function(membersInfo)
+  {
+    $("#update-notification").text(message)
+      $("#update-user").fadeIn();
+      setTimeout(function(){
+        $("#update-userr").fadeOut();
+      }, 5000);
+      });
+
+  socket.on("set-threshold", function(groupInfo)
+  {
+      var thresholdTime = groupInfo.threshold * 1000 * 60;
+
+      var threshold =  setTimeout(kickUser, thresholdTime);
+
+   $('.message').on("click" , "#" + groupInfo + inputStr ,function(event)
+    {
+        timeoutId = groupInfoId;
+        clearTimeout(threshold);
+        setTimeout(kickUser, thresholdTime);
+        timeoutId = "";
+    });
+  });
+
   socket.on("update-groups-table", function(objectifiedGroup)
   {
-    $(".ul" + systemStr + groupStr).empty();
-    $(".ul" + yourStr + groupStr).empty();
+    $(".ul" + systemStr + groupsStr).empty();
+    $(".ul" + yourStr + groupsStr).empty();
 
     for (var key in objectifiedGroup)
     {
-      console.log(objectifiedGroup[key]);
       appendGroupLists(objectifiedGroup[key]);
     }
   });
@@ -618,96 +813,61 @@ $(document).ready(function(){
 
   });
 
-  socket.on("send-group", function(group)
+
+  socket.on("delete-open-chat", function(deletedId)
   {
-      /*for(var i=0; i< group.length; i++)
+      if(deletedId === currentId)
       {
-        console.log(group[i]);
-      }*/
-
-  });
-
-  socket.on("remove-group", function(groupId){
-    //var peopleOnline = [];
-    $("#" + groupId + yourStr).remove();
-    $("#" + groupId + yourStr).remove();
-  });
-
-  $("form").submit(function(event) {
-    event.preventDefault();
-  });
-
-  $("#conversation").bind("DOMSubtreeModified",function() {
-    $("#conversation").animate({
-        scrollTop: $("#conversation")[0].scrollHeight
-      });
-  });
-
-  //enter screen
-  $("#nameForm").submit(function() {
-    var name = $("#name").val();
-    var device = "desktop";
-    if (navigator.userAgent.match(/Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile/i)) {
-      device = "mobile";
-    }
-    if (name === "" || name.length < 2) {
-      $("#errors").empty();
-      $("#errors").append("Please enter a name");
-      $("#errors").show();
-    } else {
-      socket.emit("joinserver", name, device);
-      toggleNameForm();
-      toggleChatWindow();
-      $("#msg").focus();
-    }
-  });
-
-  //'is typing' message
-  var typing = false;
-  var timeout = undefined;
-
-  function timeoutFunction() {
-    typing = false;
-    socket.emit("typing", false);
-  }
-
-  socket.on("isTyping", function(data) {
-    if (data.isTyping) {
-      if ($("#"+data.person+"").length === 0) {
-        $("#updates").append("<li id='"+ data.person +"'><span class='text-muted'><small><i class='fa fa-keyboard-o'></i> " + data.person + " is typing.</small></li>");
-        timeout = setTimeout(timeoutFunction, 5000);
+        $('#' + currentId + privateStr + chatStr).remove();
+        highlightConv(currentId, "");
+        currentId="";
+        currentMessageFrom = "";
       }
-    } else {
-      $("#"+data.person+"").remove();
-    }
   });
 
-//socket-y stuff
-//
-/*
-socket.on("exists", function(data) {
-  $("#errors").empty();
-  $("#errors").show();
-  $("#errors").append(data.msg + " Try <strong>" + data.proposedName + "</strong>");
-    toggleNameForm();
-    toggleChatWindow();
-});
+   $('ul').on("click", ".view" + userStr,function(event)
+    {
+      $('#view' + userStr + '').modal('show');
+      var str = $(event.target).parent().parent()[0].id;
+      var id = str.split(yourStr, 1)[0];
+      id = id.split(systemStr, 1)[0];
+      socket.emit("get-group", id);
 
-  socket.on("update-people", function(data){
-    //var peopleOnline = [];
-    $("#people").empty();
-    $('#people').append("<li class=\"list-group-item active\">People online <span class=\"badge\">"+data.count+"</span></li>");
+      socket.on('send-group', function(group, members, owner){
+        //$('#group-members-modal').append('<li class="view' + userStr + '">View Users</li>');
 
-   $.each(data.people, function(a, obj) {
-      if (!("country" in obj)) {
-        html = "";
-      } else {
-        html = "<img class=\"flag flag-"+obj.country+"\"/>";
-      }
-      $('#people').append("<li class=\"list-group-item\"><span>" + obj.name + "</span> <i class=\"fa fa-"+obj.device+"\"></i> " + html + " <a href=\"#\" class=\"whisper btn btn-xs\">whisper</a></li>");
-      //peopleOnline.push(obj.name);
+        $('#group-members-modal').empty(); //removes the data of previous group
+
+        $('#view-users-group-name').text("Group: " + group.name);
+        $('#view-users-group-id').text(id);
+            $('#group-members-modal').append('<li>'+ owner + '</li>');
+            for (var key in members){
+
+              $('#group-members-modal').append('<li id="' + members[key].id + '">'+members[key].name + '</li>');
+
+              if(group.owner == clientId){
+                $('#'+members[key].id+'').append('<button class="btn-kick-user fa fa-times"></button>');
+              }
+            }
+
+          $('.btn-kick-user').click(function(e){
+            var memberId = $(e.target).parent().attr('id');
+            var groupId = $('#view-users-group-id').text();
+
+            socket.emit("kick-user", groupId, memberId);
+
+            setTimeout(function(){
+              $(e.target).parent().remove();
+            }, 300);
+            e.preventDefault();
+          });
+
+       });
     });
-
+    socket.on("remove-group", function(groupId){
+      //var peopleOnline = [];
+      $("#" + groupId + yourStr).remove();
+      $("#" + groupId + yourStr).remove();
+    });
   });
-*/
-});
+

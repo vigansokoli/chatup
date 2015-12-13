@@ -20,14 +20,7 @@ app.configure(function() {
 	app.set('view engine', 'ejs');
 	app.set('views', __dirname + '/views');
 	app.engine('html', require('ejs').renderFile);
-	/* Store process-id (as priviledged user)
-	try {
-	    npid.create('/var/run/advanced-chat.pid', true);
-	} catch (err) {
-	    console.log(err);
-	    //process.exit(1);
-	}
-*/
+
 });
 
 server.listen(3000, "192.168.2.7", function(){

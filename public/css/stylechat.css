@@ -143,9 +143,11 @@
     padding: 1.5% 0%;
     overflow-y: auto;
 }
-#message
+.message-input
 {
-    width:95%;
+    position:absolute;
+    top: 91%;
+    width: 66%;
     padding:1%;
     border-radius: 10px 10px 10px 10px;
     background: white;
@@ -322,4 +324,17 @@
   background:gray;
   color: white;
 }
+#add-user-to-group
+{
+  position:fixed;
+  left:30%;
+  top:5
+
+}
+#istyping
+{
+  position:absolute;
+  top:85%;
+}
+
 

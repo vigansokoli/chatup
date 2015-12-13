@@ -24,8 +24,45 @@
               </div>
             </div>
           </div>
+            <div class="row vertical-row modal-content" id="add-user-to-group" style="display:none">
+                        <div class="modal-body">
+                          <strong><span id="user-to-join"></span></strong> wants to join the group.
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" data-dismiss="modal" class="btn" data-value="0" id="decline">Decline</button>
+                            <button type="button" data-dismiss="modal" class="btn btn-primary" data-value="1" id="approve">Approve</button>
+                        </div>
+                  </div>
               <div id="content" style="display:none">
                   <div class="modal" id="view-users" tabindex="-1" role="dialog"
+                     aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <!-- Modal Header -->
+                            <div class="modal-header">
+                              <p id="view-users-group-id" style="display:none;"></p>
+                                <button type="button" class="close"
+                                   data-dismiss="modal">
+                                       <span aria-hidden="true">&times;</span>
+                                       <span class="sr-only">Close</span>
+                                </button>
+                                <h4 class="modal-title" id="view-users-group-name">
+                                </h4>
+                            </div>
+            ​
+                            <!-- Modal Body -->
+                            <div class="modal-body">
+                                      <ul id="group-members-modal">
+                                      </ul>
+                            </div>
+                            <!-- Modal Footer -->
+                    ​      <div class="modal-footer">
+                              <button type="button" data-dismiss="modal" class="btn btn-primary">Close</button>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+                  <div class="modal" id="change-owner" tabindex="-1" role="dialog"
                      aria-labelledby="myModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -36,33 +73,24 @@
                                        <span aria-hidden="true">&times;</span>
                                        <span class="sr-only">Close</span>
                                 </button>
-                                <h4 class="modal-title" id="myModalLabel">
-                                    Group name
+                                <h4 class="modal-title" id="change-owner-title">
+                                  Change owner
                                 </h4>
                             </div>
             ​
                             <!-- Modal Body -->
                             <div class="modal-body">
-                                        <ul id="group-id">
-                                        <li id="user-id">UserName1<button class="btn-kick-user fa fa-times"></button></li><!-- li id should be the client id-->
-                                        <li id="user-id-2">UserName2 <button class="btn-kick-user fa fa-times"></button></li>
-                                        <li id="user-id-2">UserName3 <button class="btn-kick-user fa fa-times"></span></button></li>
+                                      <ul id="change-owner-list">
                                       </ul>
                             </div>
                             <!-- Modal Footer -->
-            ​
+                    ​      <div class="modal-footer">
+                              <button type="button" data-dismiss="modal" class="btn btn-primary" id="btn-change-owner">Save</button>
+                          </div>
                         </div>
                     </div>
                 </div>
-                <div id="add-user-to-group" class="modal hide fade">
-                  <div class="modal-body">
-                    <strong><span id="user-to-join">User X</span></strong> wants to join the group.
-                  </div>
-                  <div class="modal-footer">
-                      <button type="button" data-dismiss="modal" class="btn" data-value="0">Decline</button>
-                    <button type="button" data-dismiss="modal" class="btn btn-primary" data-value="1">Approve</button>
-                  </div>
-                </div>
+
                 <div class="left">
                     <div class="your-group">
 
@@ -73,7 +101,7 @@
                     </div>
                     <div class="button-class">
                             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#create-group-modal">Create group</button>
-                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#create-group-modal">Private Message</button>
+
                     </div>
                     <div class="your-private-chats">
 
@@ -96,10 +124,6 @@
 
                            </div>
 
-                          <form onsubmit="">
-                          <input type="text" id="message" autocomplete="off" palceholder="Your message here">
-                          </form>
-
                       </div>
 
                 </div>
@@ -121,6 +145,48 @@
                                                  </ul>
                                     </div>
                 </div>
+
+
+          <div id="join-password" class="modal fade">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                                <button type="button" class="close"
+                                   data-dismiss="modal">
+                                       <span aria-hidden="true">&times;</span>
+                                       <span class="sr-only">Close</span>
+                                </button>
+                                <h4 class="modal-title" id="myModalLabel">
+                                    Type-in the password
+                                </h4>
+                                <span id="error-create-group"></span>
+                            </div>
+                        <div class="modal-body">
+                            <label class="col-sm-2 control-label"
+                                            for="group-type" >Password:</label>
+                            <input type="password" id="input-password"></input>
+                        </div>
+                        <div class="modal-footer">
+                            <span id="error-password" class="red"></span>
+                           <button type="button" class="btn btn-primary" id="join-button">
+                                  Join
+                              </button>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+
+          <div class="row vertical-row modal" id="update-user" style="display:none">
+                                <div class="alert alert-success">
+                                  <p id="update-notification"></p>
+                                </div>
+                              </div>
+                              <div class="row vertical-row" id="approve-system" style="display:none">
+                                <div class="alert alert-success">
+
+                                </div>
+
+                       </div>
                 <div class="modal fade" id="create-group-modal" tabindex="-1" role="dialog"
          aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">

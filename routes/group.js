@@ -1,12 +1,10 @@
-function Group(name, id, owner, permission) {
+function Group(name, id, owner, permission,threshold) {
   this.name = name;
   this.id = id;
   this.owner = owner;
   this.people = [];
   this.permission = permission;
-  //this.peopleLimit = 4;
-  //this.status = "available";
-  //this.private = false;
+  this.threshold = threshold;
 };
 
 Group.prototype.addPerson = function(personId) {
@@ -21,13 +19,19 @@ Group.prototype.removePerson = function(personId) {
       break;
     }
   }
-  this.people.remove(personIndex);
+  this.people.splice(i,1);
+};
+
+
+Group.prototype.removePersonIndex = function(personIndex) {
+
+  this.people.splice(personIndex,1);
 };
 
 Group.prototype.isMember = function(personId) {
   for(var i = 0; i < this.people.length; i++){
     if(this.people[i]=== personId){
-      return true;
+      return i;
     }
   }
   return false;
